@@ -3,8 +3,6 @@ package main;
 import libraries.lua.com.lua.LuaAPIRegistry;
 import modules.mainmodule;
 
-import libraries.lua.com.lua.lua.*;
-
 import static libraries.lua.com.lua.lua.*;
 
 public class Main {
@@ -15,16 +13,19 @@ public class Main {
             Thread.sleep(1000);
         } catch (InterruptedException e) {
             e.printStackTrace();
+            e.fillInStackTrace();
         }
         try {
             mainmodule.configLoad();
         } catch (Exception e) {
             e.printStackTrace();
+            e.fillInStackTrace();
         }
         try {
             table table = new table();
         } catch (Exception e) {
             e.printStackTrace();
+            e.fillInStackTrace();
         }
         try {
             LuaAPIRegistry.registerMinecraftAPIs();

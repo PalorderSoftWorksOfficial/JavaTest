@@ -13,11 +13,18 @@ if not exist %LIBS_DIR% mkdir %LIBS_DIR%
 
 REM Compile all Java files recursively, including any jars in libs for compilation
 set CP=
-for %%J in (%LIBS_DIR%\*.jar) do (
+for %%J in (libraries\*\*\*\*\*\*.java) do (
     set CP=!CP!;%%J
 )
 
 for /R %%f in (*.java) do (
+    if defined CP (
+        javac -d %BUILD_DIR% -cp ".!CP!" %%f
+    ) else (
+        javac -d %BUILD_DIR% %%f
+    )
+)
+for /R %%f in (*\*\*\*\*\*\*.java) do (
     if defined CP (
         javac -d %BUILD_DIR% -cp ".!CP!" %%f
     ) else (
@@ -42,8 +49,8 @@ for %%F in (%BUILD_DIR%\*) do (
     )
 )
 
-REM Include all JARs inside libs/ into the final JAR (unpacked)
-for %%J in (%LIBS_DIR%\*.jar) do (
+REM Include all libraries inside libraries/ into the final JAR (unpacked)
+for %%J in (%LIBS_DIR%\*.java) do (
     echo Adding %%~nxJ to JAR...
     pushd %LIBS_DIR%
     jar xf %%~nxJ

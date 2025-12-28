@@ -21,7 +21,9 @@ public class LuaAPIRegistry {
         register("table", new lua.table());
 
     }
-
+    public static class MinecraftChatAPI {}
+    public static class MinecraftWorldAPI {}
+    public static class MinecraftPlayerAPI {}
     /** Register a named API */
     public static void register(String name, Object api) {
         apis.put(name.toLowerCase(), api);

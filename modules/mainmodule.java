@@ -1,15 +1,13 @@
 package modules;
 
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
-import java.lang.reflect.Field;
 
 public class mainmodule {
 
-    public String teststring;
-    public int testnumber;
-    public boolean testboolean;
-    public double testdouble;
+    private final Map<String, Object> config = new HashMap<>();
 
     public void sayHello() {
         System.out.println("Hello from Module!");
@@ -22,27 +20,56 @@ public class mainmodule {
                 props.load(in);
                 for (String key : props.stringPropertyNames()) {
                     String value = props.getProperty(key);
-                    Field field;
-                    try {
-                        field = mainmodule.class.getDeclaredField(key);
-                    } catch (NoSuchFieldException e) {
-                        continue;
-                    }
-                    field.setAccessible(true);
-                    Object parsed = parseValue(value, field.getType());
-                    field.set(this, parsed);
+                    config.put(key, parseValue(value));
                 }
+            } else {
+                System.err.println("Config file not found!");
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    private Object parseValue(String value, Class<?> type) {
-        if (type == String.class) return value;
-        if (type == int.class || type == Integer.class) return Integer.parseInt(value);
-        if (type == boolean.class || type == Boolean.class) return Boolean.parseBoolean(value);
-        if (type == double.class || type == Double.class) return Double.parseDouble(value);
-        return null;
+    private Object parseValue(String value) {
+        if (value.equalsIgnoreCase("true") || value.equalsIgnoreCase("false")) {
+            return Boolean.parseBoolean(value);
+        }
+        try {
+            if (value.contains(".")) return Double.parseDouble(value);
+            return Integer.parseInt(value);
+        } catch (NumberFormatException ignored) {
+        }
+        return value;
+    }
+
+    public Object get(String key) {
+        return config.get(key);
+    }
+
+    public String getString(String key) {
+        Object val = config.get(key);
+        return val != null ? val.toString() : null;
+    }
+
+    public int getInt(String key, int defaultValue) {
+        Object val = config.get(key);
+        if (val instanceof Number) return ((Number) val).intValue();
+        try { return Integer.parseInt(val.toString()); } catch (Exception e) { return defaultValue; }
+    }
+
+    public double getDouble(String key, double defaultValue) {
+        Object val = config.get(key);
+        if (val instanceof Number) return ((Number) val).doubleValue();
+        try { return Double.parseDouble(val.toString()); } catch (Exception e) { return defaultValue; }
+    }
+
+    public boolean getBoolean(String key, boolean defaultValue) {
+        Object val = config.get(key);
+        if (val instanceof Boolean) return (Boolean) val;
+        try { return Boolean.parseBoolean(val.toString()); } catch (Exception e) { return defaultValue; }
+    }
+
+    public Map<String, Object> getAllConfig() {
+        return new HashMap<>(config);
     }
 }
